@@ -1,5 +1,6 @@
 import logo from './logo.svg';
 import './App.css';
+import { useState } from 'react';
 
 function Header(props){
   console.log('props',props);
@@ -21,7 +22,7 @@ function Nav(props){
     (<li key={t.id}>
       <a id={t.id}href={'/read/'+t.id} onClick={event=>{
         event.preventDefault();
-        props.onChangeMode(event.target.id);
+        props.onChangeMode(Number(event.target.id));
       }}>{t.title}</a>
     </li>);
   }
@@ -42,21 +43,74 @@ function Article(props){
   )
 }
 
+function Create(props){
+  return (<article>
+    <form>
+      <h2>CREATE</h2>
+      <form onSubmit={event=>{
+        event.preventDefault();
+        const title=event.target.title.value;
+        const body=event.target.body.value;
+        props.onCreate(title,body)
+      }}>
+
+      </form>
+      <p><input type='text' name="title" placeholder='title' /></p>
+      <p><textarea placeholder='body' /></p>
+      <p><input type='submit' value="submit" /></p>
+    </form>
+  </article>
+  )
+}
+
 function App() {
-  const topics=[
+  const [mode,setMode]=useState("WELCOME");
+  const[id,setId]=useState(null);
+  const [nextID,setNextId]=useState(4);
+  const [topics,setTopics]=useState([
     {id:1, title:"html",body:"html..is"},
     {id:2, title:"css",body:"css..is"},
     {id:3, title:"js",body:"js..is"}
-  ]
+  ])
+  let content=null;
+  if(mode==="WELCOME"){
+      content=<Article title="WELCOME" body="Hello, web"></Article>
+  }
+  else if(mode==="READ"){
+    let body,title=null;
+    for(let i=0; i<topics.length; i++){
+        if(topics[i].id===id){
+          title=topics[i].title;
+          body=topics[i].body;
+        }
+    }
+      content=<Article title={title} body={body}></Article>
+  }
+
+  else if(mode==="CREATE"){
+    content=<Create onCreate={(_title,_body)=>{
+      const newTopic={title:_title,body:_body}
+      const newTopics=[...topics]
+      newTopics.push(newTopic);
+      setTopics(newTopics);
+    }}></Create>
+  }
   return (
     <div>
     <Header title="WEB" onChangeMode={()=>{
-      alert("Head");
+      setMode("WELCOME");
     }}></Header>
-    <Nav topics={topics} onChangeMode={(id)=>{
-      alert(id);
+    
+    <Nav topics={topics} onChangeMode={(_id)=>{
+     setMode("READ");
+     setId(_id);
     }}></Nav>
-    <Article title="welcome" body="Hello Web"></Article>
+    <a href='/Create' onClick={event=>{
+      event.preventDefault();
+      setMode("CREATE");
+    }}>Create</a>
+
+    {content}
     </div>
   );
 }
