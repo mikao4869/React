@@ -3,7 +3,6 @@ import './App.css';
 import { useState } from 'react';
 
 function Header(props){
-  console.log('props',props);
   return(
     <header>
     <h1><a href='/' onClick={(event)=>{
@@ -44,8 +43,8 @@ function Article(props){
 }
 
 function Create(props){
-  return (<article>
-    <form>
+  return <article>
+
       <h2>CREATE</h2>
       <form onSubmit={event=>{
         event.preventDefault();
@@ -54,19 +53,19 @@ function Create(props){
         props.onCreate(title,body)
       }}>
 
-      </form>
       <p><input type='text' name="title" placeholder='title' /></p>
-      <p><textarea placeholder='body' /></p>
+      <p><textarea name="body"placeholder='body' /></p>
       <p><input type='submit' value="submit" /></p>
-    </form>
+
+      </form>
   </article>
-  )
+
 }
 
 function App() {
   const [mode,setMode]=useState("WELCOME");
   const[id,setId]=useState(null);
-  const [nextID,setNextId]=useState(4);
+  const [nextId,setNextId]=useState(4);
   const [topics,setTopics]=useState([
     {id:1, title:"html",body:"html..is"},
     {id:2, title:"css",body:"css..is"},
@@ -84,15 +83,18 @@ function App() {
           body=topics[i].body;
         }
     }
-      content=<Article title={title} body={body}></Article>
+      content=< Article title={title} body={body}></Article>
   }
 
   else if(mode==="CREATE"){
     content=<Create onCreate={(_title,_body)=>{
-      const newTopic={title:_title,body:_body}
+      const newTopic={id:nextId,title:_title,body:_body}
       const newTopics=[...topics]
       newTopics.push(newTopic);
       setTopics(newTopics);
+      setMode('READ');
+      setId(nextId);
+      setNextId(nextId+1);
     }}></Create>
   }
   return (
