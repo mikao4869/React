@@ -44,7 +44,6 @@ function Article(props){
 
 function Create(props){
   return <article>
-
       <h2>CREATE</h2>
       <form onSubmit={event=>{
         event.preventDefault();
@@ -59,7 +58,26 @@ function Create(props){
 
       </form>
   </article>
+}
 
+function Update(props){
+  const [title,setTitle]=useState(props.title);
+  const [body,setBody]=useState(props.body);
+  return <article>
+  <h2>Update</h2>
+  <form onSubmit={event=>{
+    event.preventDefault();
+    const title=event.target.title.value;
+    const body=event.target.body.value;
+    props.onUpdate(title,body)
+  }}>
+  <p><input type='text' name="title" placeholder='title' value={props.title} onChange={event=>{
+    console.log(event.target.value);
+  }}/></p>
+  <p><textarea name="body"placeholder='body' value={props.body}/></p>
+  <p><input type='submit' value="Update" /></p>
+  </form>
+</article>
 }
 
 function App() {
@@ -72,6 +90,7 @@ function App() {
     {id:3, title:"js",body:"js..is"}
   ])
   let content=null;
+  let contextControl=null;
   if(mode==="WELCOME"){
       content=<Article title="WELCOME" body="Hello, web"></Article>
   }
@@ -84,6 +103,11 @@ function App() {
         }
     }
       content=< Article title={title} body={body}></Article>
+      contextControl=<li><a href={'/update'+id} onClick={event=>{
+        event.preventDefault();
+        setMode("Update");
+      }}>Update</a></li>
+  
   }
 
   else if(mode==="CREATE"){
@@ -97,6 +121,20 @@ function App() {
       setNextId(nextId+1);
     }}></Create>
   }
+
+  else if(mode==="Update"){
+    let body,title=null;
+    for(let i=0; i<topics.length; i++){
+      if(topics[i].id===id){
+        title=topics[i].title;
+        body=topics[i].body;
+      }
+    }
+    content=<Update title={title} body={body} onUpdate={(title,body)=>{
+    }}></Update>
+  }
+
+
   return (
     <div>
     <Header title="WEB" onChangeMode={()=>{
@@ -107,10 +145,16 @@ function App() {
      setMode("READ");
      setId(_id);
     }}></Nav>
-    <a href='/Create' onClick={event=>{
-      event.preventDefault();
-      setMode("CREATE");
-    }}>Create</a>
+    <ul>
+      <li>
+        <a href='/Create' onClick={event=>{
+          event.preventDefault();
+          setMode("CREATE");
+        }}>Create
+        </a>
+      </li>
+      {contextControl}
+    </ul>
 
     {content}
     </div>
