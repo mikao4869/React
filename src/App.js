@@ -71,10 +71,12 @@ function Update(props){
     const body=event.target.body.value;
     props.onUpdate(title,body)
   }}>
-  <p><input type='text' name="title" placeholder='title' value={props.title} onChange={event=>{
-    console.log(event.target.value);
+  <p><input type='text' name="title" placeholder='title' value={title} onChange={event=>{
+    setTitle(event.target.value);
   }}/></p>
-  <p><textarea name="body"placeholder='body' value={props.body}/></p>
+  <p><textarea name="body"placeholder='body' value={body} onChange={event=>{
+    setBody(event.target.value);
+  }}/></p>
   <p><input type='submit' value="Update" /></p>
   </form>
 </article>
@@ -131,6 +133,17 @@ function App() {
       }
     }
     content=<Update title={title} body={body} onUpdate={(title,body)=>{
+      console.log(body,title);
+      const updatedTopic={id:id,title:title,body:body};
+      const newTopics=[...topics];
+      for(let i=0; i<newTopics.length; i++){
+        if(newTopics[i].id===id){
+          newTopics[i]=updatedTopic;
+          break;
+        }
+      }
+      setTopics(newTopics);
+      setMode("READ");
     }}></Update>
   }
 
